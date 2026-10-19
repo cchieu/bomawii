@@ -1,0 +1,182 @@
+{
+  "entities": {
+    "Package": {
+      "title": "Package",
+      "description": "WiFi internet access package available for purchase",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 100 },
+        "priceKes": { "type": "number" },
+        "durationMinutes": { "type": "number" },
+        "speedLimitDownloadKbps": { "type": "number" },
+        "speedLimitUploadKbps": { "type": "number" },
+        "dataLimitMb": { "type": "number" },
+        "description": { "type": "string", "maxLength": 255 },
+        "isActive": { "type": "boolean" },
+        "isSample": { "type": "boolean" },
+        "sortOrder": { "type": "number" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["name", "priceKes", "durationMinutes", "isActive"]
+    },
+    "PaymentOrder": {
+      "title": "PaymentOrder",
+      "description": "Internal payment order and STK Push tracking",
+      "type": "object",
+      "properties": {
+        "orderNumber": { "type": "string", "maxLength": 64 },
+        "phone": { "type": "string", "maxLength": 20 },
+        "amountKes": { "type": "number" },
+        "packageId": { "type": "string", "maxLength": 64 },
+        "packageName": { "type": "string", "maxLength": 100 },
+        "durationMinutes": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "completed", "failed", "cancelled", "expired"] },
+        "merchantRequestId": { "type": "string", "maxLength": 100 },
+        "checkoutRequestId": { "type": "string", "maxLength": 100 },
+        "mpesaReceiptNumber": { "type": "string", "maxLength": 50 },
+        "customerMac": { "type": "string", "maxLength": 50 },
+        "customerIp": { "type": "string", "maxLength": 50 },
+        "isSimulated": { "type": "boolean" },
+        "failureReason": { "type": "string", "maxLength": 255 },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "expiresAt": { "type": "string" }
+      },
+      "required": ["orderNumber", "phone", "amountKes", "packageId", "status", "createdAt"]
+    },
+    "Transaction": {
+      "title": "Transaction",
+      "description": "Verified M-Pesa transaction record",
+      "type": "object",
+      "properties": {
+        "orderId": { "type": "string", "maxLength": 64 },
+        "mpesaReceiptNumber": { "type": "string", "maxLength": 50 },
+        "amountKes": { "type": "number" },
+        "phone": { "type": "string", "maxLength": 20 },
+        "transactionDate": { "type": "string" },
+        "status": { "type": "string", "enum": ["verified", "reconciled"] },
+        "isSimulated": { "type": "boolean" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["orderId", "mpesaReceiptNumber", "amountKes", "phone", "status", "createdAt"]
+    },
+    "Customer": {
+      "title": "Customer",
+      "description": "Customer profile indexed by Kenyan phone number",
+      "type": "object",
+      "properties": {
+        "phone": { "type": "string", "maxLength": 20 },
+        "totalSpentKes": { "type": "number" },
+        "totalSessionsCount": { "type": "number" },
+        "lastSeenAt": { "type": "string" },
+        "lastMacAddress": { "type": "string", "maxLength": 50 },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["phone", "totalSpentKes", "totalSessionsCount"]
+    },
+    "HotspotSession": {
+      "title": "HotspotSession",
+      "description": "Active or historical customer WiFi internet session",
+      "type": "object",
+      "properties": {
+        "orderId": { "type": "string", "maxLength": 64 },
+        "phone": { "type": "string", "maxLength": 20 },
+        "macAddress": { "type": "string", "maxLength": 50 },
+        "ipAddress": { "type": "string", "maxLength": 50 },
+        "packageId": { "type": "string", "maxLength": 64 },
+        "packageName": { "type": "string", "maxLength": 100 },
+        "voucherCode": { "type": "string", "maxLength": 50 },
+        "status": { "type": "string", "enum": ["active", "expired", "revoked"] },
+        "startedAt": { "type": "string" },
+        "expiresAt": { "type": "string" },
+        "totalBytesIn": { "type": "number" },
+        "totalBytesOut": { "type": "number" },
+        "routerUserId": { "type": "string", "maxLength": 100 },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["phone", "packageId", "status", "startedAt", "expiresAt"]
+    },
+    "RouterConfiguration": {
+      "title": "RouterConfiguration",
+      "description": "MikroTik RouterOS integration configuration and status",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 100 },
+        "host": { "type": "string", "maxLength": 255 },
+        "port": { "type": "number" },
+        "username": { "type": "string", "maxLength": 100 },
+        "hotspotServerName": { "type": "string", "maxLength": 100 },
+        "isLive": { "type": "boolean" },
+        "lastStatus": { "type": "string", "enum": ["online", "offline", "unconfigured", "mock_mode"] },
+        "lastPingAt": { "type": "string" },
+        "pingLatencyMs": { "type": "number" },
+        "totalActiveUsers": { "type": "number" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["name", "isLive", "lastStatus"]
+    },
+    "Administrator": {
+      "title": "Administrator",
+      "description": "System administrator user record",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "maxLength": 255 },
+        "role": { "type": "string", "enum": ["superadmin", "admin", "staff"] },
+        "name": { "type": "string", "maxLength": 100 },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["email", "role"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Administrative actions audit log",
+      "type": "object",
+      "properties": {
+        "actorEmail": { "type": "string", "maxLength": 255 },
+        "actorUid": { "type": "string", "maxLength": 128 },
+        "action": { "type": "string", "maxLength": 100 },
+        "resourceType": { "type": "string", "maxLength": 50 },
+        "resourceId": { "type": "string", "maxLength": 100 },
+        "details": { "type": "string", "maxLength": 1000 },
+        "timestamp": { "type": "string" }
+      },
+      "required": ["actorEmail", "action", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/packages/{packageId}": {
+      "schema": { "$ref": "#/entities/Package" },
+      "description": "Configurable WiFi internet plans available for customers"
+    },
+    "/paymentOrders/{orderId}": {
+      "schema": { "$ref": "#/entities/PaymentOrder" },
+      "description": "Payment orders initiated by customers via STK Push"
+    },
+    "/transactions/{transactionId}": {
+      "schema": { "$ref": "#/entities/Transaction" },
+      "description": "Verified M-Pesa transaction records"
+    },
+    "/customers/{customerId}": {
+      "schema": { "$ref": "#/entities/Customer" },
+      "description": "Aggregated customer spending and session history"
+    },
+    "/hotspotSessions/{sessionId}": {
+      "schema": { "$ref": "#/entities/HotspotSession" },
+      "description": "Active and past WiFi access sessions"
+    },
+    "/routerConfigurations/{configId}": {
+      "schema": { "$ref": "#/entities/RouterConfiguration" },
+      "description": "Router connection metadata and live status"
+    },
+    "/administrators/{adminId}": {
+      "schema": { "$ref": "#/entities/Administrator" },
+      "description": "Admin access control and permissions"
+    },
+    "/auditLogs/{logId}": {
+      "schema": { "$ref": "#/entities/AuditLog" },
+      "description": "System and administrative action audit logs"
+    }
+  }
+}

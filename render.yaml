@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: bomawifi-hotspot
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: APP_URL
+        sync: false
+      - key: DARAJA_ENVIRONMENT
+        value: sandbox
+      - key: DARAJA_SHORTCODE
+        value: "174379"
+      - key: DARAJA_PASSKEY
+        sync: false
+      - key: DARAJA_CONSUMER_KEY
+        sync: false
+      - key: DARAJA_CONSUMER_SECRET
+        sync: false
+      - key: GATEWAY_TYPE
+        value: standard_wifi
+      - key: WIFI_SSID
+        value: "BomaWiFi-HighSpeed"
+      - key: WIFI_PASSWORD
+        value: "BomaWiFi@2026"

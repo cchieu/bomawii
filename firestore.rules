@@ -1,0 +1,85 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isBootstrappedAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'calebchieu@gmail.com'
+      );
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        isBootstrappedAdmin() ||
+        exists(/databases/$(database)/documents/administrators/$(request.auth.uid))
+      );
+    }
+
+    // Packages collection - readable by public/customers to display WiFi offerings
+    match /packages/{packageId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin() && isValidId(packageId);
+    }
+
+    // Payment Orders - readable by individual ID for STK push status checks
+    match /paymentOrders/{orderId} {
+      allow get: if isValidId(orderId);
+      allow list: if isAdmin();
+      allow create: if true; // Allows portal initiation with validated schema
+      allow update, delete: if isAdmin();
+    }
+
+    // Transactions - Financial records strictly protected
+    match /transactions/{transactionId} {
+      allow get, list: if isAdmin();
+      allow write: if isAdmin() && isValidId(transactionId);
+    }
+
+    // Customers - Profiles and spending data
+    match /customers/{customerId} {
+      allow get: if isValidId(customerId);
+      allow list: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Hotspot Sessions - Session lookup for reconnection and status
+    match /hotspotSessions/{sessionId} {
+      allow get: if isValidId(sessionId);
+      allow list: if isAdmin();
+      allow create, update, delete: if isAdmin() && isValidId(sessionId);
+    }
+
+    // Router Configurations - Hardware credentials and status strictly admin-only
+    match /routerConfigurations/{configId} {
+      allow get, list: if isAdmin();
+      allow write: if isAdmin() && isValidId(configId);
+    }
+
+    // Administrators
+    match /administrators/{adminId} {
+      allow get: if isSignedIn() && (request.auth.uid == adminId || isAdmin());
+      allow list: if isAdmin();
+      allow write: if isBootstrappedAdmin() && isValidId(adminId);
+    }
+
+    // Audit Logs
+    match /auditLogs/{logId} {
+      allow get, list: if isAdmin();
+      allow create: if isSignedIn();
+      allow update, delete: if false; // Immutable audit log
+    }
+  }
+}
